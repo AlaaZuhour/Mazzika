@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="transOrange">#49e47f6a</color>
+    <color name="orange">#ffbd4a</color>
+    <color name="light_pink">#e47f6a</color>
+    <color name="transOrangee">#79e47f6a</color>
+
+</resources>
