@@ -4,19 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     tools:context="com.udacity.capstone.musicapp.ui.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transOrange"
+        android:background="@drawable/toolbar_back"
         android:gravity="left"
         android:minHeight="?attr/actionBarSize"
         android:textAlignment="gravity"
-        android:textDirection="anyRtl"
-        android:theme="?attr/actionBarTheme"
+        android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:visibility="visible"
         app:title="Live Recorder"
         app:titleTextColor="@color/orange" />

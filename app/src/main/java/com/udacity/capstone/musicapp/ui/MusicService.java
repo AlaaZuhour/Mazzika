@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -14,7 +15,6 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.mp4.Mp4Extractor;
-import com.google.android.exoplayer2.source.DynamicConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
@@ -36,7 +36,7 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     private SimpleExoPlayer mExoPlayer;
     private final IBinder musicBind = new MusicBinder();
     private ArrayList<Song> songs;
-    private PriorityQueue songsQueue;
+
     //current position
     private int songPosn=0;
 
@@ -52,26 +52,24 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
         return mExoPlayer;
     }
 
-    public PriorityQueue getSongsQueue() {
-        return songsQueue;
-    }
 
-    public void setSongsQueue(PriorityQueue songsQueue1){
-        songsQueue = songsQueue1;
-    }
     public void setList(ArrayList<Song> theSongs){
         songs=theSongs;
+    }
+
+    public void setSongPosn(int position){
+        this.songPosn = position;
     }
 
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
-
+        Log.d("next","timeLine");
     }
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
+        Log.d("next","tracks");
     }
 
     @Override
@@ -82,7 +80,7 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
        if(playbackState == ExoPlayer.STATE_ENDED){
-           playSong();
+           playNext();
        }
     }
 
@@ -103,7 +101,7 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
+        Log.d("next","playback");
     }
 
     public class MusicBinder extends Binder {
@@ -141,19 +139,11 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
 
     }
     public void playSong(){
-//        songsQueue=MainActivity.songsQueue;
-         if (songsQueue != null && songsQueue.size() != 0) {
-             Song playSong = songsQueue.remove();
-             songsQueue.insert(playSong);
-             MediaSource mediaSource1 = new DynamicConcatenatingMediaSource();
-             ((DynamicConcatenatingMediaSource)mediaSource1).addMediaSource(
-                     buildMediaSource(playSong.getStreamUrl()));
+             Song playSong = songs.get(songPosn);
+             MediaSource mediaSource1 = buildMediaSource(playSong.getStreamUrl());
              mExoPlayer.prepare(mediaSource1);
              mExoPlayer.setPlayWhenReady(true);
-         }
-    }
-    public void setSong(int songIndex){
-        songPosn=songIndex;
+
     }
     @Override
     public boolean onUnbind(Intent intent){
@@ -164,5 +154,25 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
 
     public void pause(){
         mExoPlayer.setPlayWhenReady(false);
+    }
+
+    public void playNext(){
+        int newPos = ++songPosn;
+        if(newPos < songs.size()){
+            songPosn += songPosn;
+        }else{
+            songPosn=0;
+        }
+        playSong();
+    }
+
+    public void playPrev(){
+        int newPos = --songPosn;
+        if(newPos > 0){
+            songPosn -= songPosn;
+        }else{
+            songPosn=0;
+        }
+        playSong();
     }
 }

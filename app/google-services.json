@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "517777606853",
+    "firebase_url": "https://mazzika-20ea1.firebaseio.com",
+    "project_id": "mazzika-20ea1",
+    "storage_bucket": "mazzika-20ea1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517777606853:android:35fd1303898165a5",
+        "android_client_info": {
+          "package_name": "com.udacity.capstone.musicapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517777606853-3nkoqrptl27ng89f08p15hpvmbghi3o3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAzAE9h6NfJ4jwIC3-m7SOQ_qI7KAbLZE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

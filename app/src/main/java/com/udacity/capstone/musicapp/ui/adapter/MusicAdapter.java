@@ -48,6 +48,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.RecyclerView
         this.itemList = items;
         isSearch = true;
     }
+    public void setMusicList(ArrayList<Song> songs){
+        this.musicList = songs;
+        isSearch =false;
+    }
 
 
     @Override

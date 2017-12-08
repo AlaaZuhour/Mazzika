@@ -1,21 +1,25 @@
 package com.udacity.capstone.musicapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.udacity.capstone.musicapp.R;
 import com.udacity.capstone.musicapp.ui.fragment.HomeFragment;
 import com.udacity.capstone.musicapp.ui.fragment.YouTubeFragment;
 
 
-public class MainActivity extends YouTubeBaseActivity implements SongSelectedListener{
+public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
@@ -56,6 +60,15 @@ public class MainActivity extends YouTubeBaseActivity implements SongSelectedLis
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.home);
 
+        FirebaseAuth.AuthStateListener authListener =  firebaseAuth -> {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    // user auth state is changed - user is null
+                    // launch login activity
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                }
+        };
 
 
     }
@@ -118,8 +131,4 @@ public class MainActivity extends YouTubeBaseActivity implements SongSelectedLis
                 return false;
             };
 
-    @Override
-    public void onSongSelectedListener(int postion) {
-
-    }
 }

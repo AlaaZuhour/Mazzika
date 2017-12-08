@@ -81,6 +81,10 @@ public class Item implements Parcelable{
         return snippet;
     }
 
+    public Videos getVideos() {
+        return videos;
+    }
+
     public void setSnippet(Snippet snippet) {
         this.snippet = snippet;
     }

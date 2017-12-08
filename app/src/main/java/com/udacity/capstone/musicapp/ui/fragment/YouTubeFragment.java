@@ -1,6 +1,7 @@
 package com.udacity.capstone.musicapp.ui.fragment;
 
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -15,6 +16,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerFragment;
+import com.google.firebase.auth.FirebaseAuth;
 import com.udacity.capstone.musicapp.R;
 import com.udacity.capstone.musicapp.model.Item;
 import com.udacity.capstone.musicapp.model.SearchResponse;
@@ -31,6 +38,7 @@ import retrofit2.Response;
 
 public class YouTubeFragment extends Fragment implements SongSelectedListener{
 
+    private static final String API_KEY = "AIzaSyBJr1wF9qw70RxyqA0MCBcuxtu3-GxF_LE";
     private OnFragmentInteractionListener mListener;
 
     private SearchResponse searchResponse;
@@ -57,6 +65,8 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
         mRecyclerView = view.findViewById(R.id.search_list);
         searchButton = view.findViewById(R.id.search_button);
         searchText = view.findViewById(R.id.search_word);
+        FirebaseAuth auth= FirebaseAuth.getInstance();
+        auth.signOut();
         int ot = getResources().getConfiguration().orientation;
         layoutManager =
                 new GridLayoutManager(getActivity(),ot == Configuration.ORIENTATION_LANDSCAPE ? 4 : 2);
@@ -103,14 +113,27 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
 
     @Override
     public void onSongSelectedListener(int postion) {
-        Bundle arg = new Bundle();
-        arg.putParcelable(getString(R.string.song_item),searchResponse.getItems().get(postion));
-        PlayFragment fragment = new PlayFragment();
-        fragment.setArguments(arg);
-        getActivity().getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit();
+        FragmentManager fm = getFragmentManager();
+        String tag = YouTubePlayerFragment.class.getSimpleName();
+        YouTubePlayerFragment playerFragment = (YouTubePlayerFragment) fm.findFragmentByTag(tag);
+        if (playerFragment == null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            playerFragment = YouTubePlayerFragment.newInstance();
+            ft.replace(android.R.id.content, playerFragment, tag);
+            ft.addToBackStack(null);
+            ft.commit();
+        }
+        playerFragment.initialize(API_KEY, new YouTubePlayer.OnInitializedListener() {
+            @Override
+            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
+                youTubePlayer.cueVideo(searchResponse.getItems().get(postion).getVideos().getVideoId());
+            }
+
+            @Override
+            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+                Toast.makeText(getActivity(), "Error while initializing YouTubePlayer.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 

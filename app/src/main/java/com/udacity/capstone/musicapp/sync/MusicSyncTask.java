@@ -1,5 +1,6 @@
 package com.udacity.capstone.musicapp.sync;
 
+import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -31,13 +32,16 @@ public class MusicSyncTask {
 
     }
 
+    public static void setListener(Fragment fragment){
+        mListener = (TaskCompletedListener) fragment;
+    }
+
 
 
     private static void syncMusic(final Context context){
         ITunes songService = RetrofitBuilder.Retrieve();
         Call<SongResponse> songList = songService.getSongs();
         songResponse = new SongResponse();
-        mListener = (TaskCompletedListener) context;
         songList.enqueue(new Callback<SongResponse>() {
             @Override
             public void onResponse(@NonNull Call<SongResponse> call, @NonNull Response<SongResponse> response) {

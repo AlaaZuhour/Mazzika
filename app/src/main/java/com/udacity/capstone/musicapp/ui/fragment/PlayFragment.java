@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +16,31 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistTracker;
+import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.udacity.capstone.musicapp.R;
+import com.udacity.capstone.musicapp.model.Song;
 import com.udacity.capstone.musicapp.ui.MusicService;
 
+import java.util.ArrayList;
 
-public class PlayFragment extends Fragment implements YouTubePlayer.OnInitializedListener {
+import jp.wasabeef.glide.transformations.BlurTransformation;
 
 
-    private OnFragmentInteractionListener mListener;
+public class PlayFragment extends Fragment implements View.OnClickListener{
+
+
     private MusicService musicSrv;
     private boolean musicBound=false;
     private Intent playIntent;
+    private View nextButton,prevButton;
+    private ArrayList<Song> songArrayList;
+    private int songPos;
     private ImageView songImage, backgroundImage;
     private SimpleExoPlayerView exoPlayerView;
 
@@ -54,10 +66,23 @@ public class PlayFragment extends Fragment implements YouTubePlayer.OnInitialize
         View rootView =  inflater.inflate(R.layout.fragment_play, container, false);
         backgroundImage = rootView.findViewById(R.id.imageView2);
         songImage = rootView.findViewById(R.id.song_image);
-        //exoPlayerView = rootView.findViewById(R.id.playerView);
+        exoPlayerView = rootView.findViewById(R.id.playerView);
+        exoPlayerView.requestFocus();
+        nextButton = rootView.findViewById(com.google.android.exoplayer2.ui.R.id.exo_next);
+        prevButton = rootView.findViewById(com.google.android.exoplayer2.ui.R.id.exo_prev);
+        nextButton.setEnabled(true);
+        nextButton.setOnClickListener(this);
+        prevButton.setOnClickListener(this);
+        exoPlayerView.setControllerShowTimeoutMs(0);
+        songArrayList = getArguments().getParcelableArrayList("songs");
+        songPos = getArguments().getInt("position");
 
+        Glide.with(getActivity()).load(songArrayList.get(songPos).getImageUrl())
+                .apply(RequestOptions.bitmapTransform(new BlurTransformation(30)))
+                .into(backgroundImage);
 
-        //Glide.with(getActivity()).
+        Glide.with(getActivity()).load(songArrayList.get(songPos).getImageUrl())
+                .into(songImage);
         return rootView;
     }
 
@@ -75,8 +100,10 @@ public class PlayFragment extends Fragment implements YouTubePlayer.OnInitialize
 
     @Override
     public void onDetach() {
+        getActivity().stopService(playIntent);
+        musicBound=false;
+        musicSrv=null;
         super.onDetach();
-        mListener = null;
     }
 
     private ServiceConnection musicConnection = new ServiceConnection(){
@@ -87,7 +114,10 @@ public class PlayFragment extends Fragment implements YouTubePlayer.OnInitialize
             //get service
             musicSrv = binder.getService();
             //pass list
-            //musicSrv.setList(tracks);
+            musicSrv.setList(songArrayList);
+            musicSrv.setSongPosn(songPos);
+            exoPlayerView.setPlayer(musicSrv.getExoPlayer());
+            musicSrv.playSong();
             musicBound = true;
         }
 
@@ -106,14 +136,27 @@ public class PlayFragment extends Fragment implements YouTubePlayer.OnInitialize
     }
 
     @Override
-    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-
+    public void onPause() {
+        musicSrv.pause();
+        super.onPause();
     }
 
     @Override
-    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-
+    public void onStop() {
+        musicSrv.pause();
+        super.onStop();
     }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v == nextButton){
+            musicSrv.playNext();
+        }else if(v==prevButton){
+            musicSrv.playPrev();
+        }
+    }
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name

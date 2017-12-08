@@ -1,5 +1,7 @@
 package com.udacity.capstone.musicapp.ui.fragment;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -22,11 +24,13 @@ import com.udacity.capstone.musicapp.data.MusicContract;
 import com.udacity.capstone.musicapp.model.Song;
 import com.udacity.capstone.musicapp.sync.MusicSyncTask;
 import com.udacity.capstone.musicapp.ui.MainActivity;
+import com.udacity.capstone.musicapp.ui.SongSelectedListener;
 import com.udacity.capstone.musicapp.ui.adapter.MusicAdapter;
 
 import java.util.ArrayList;
 
-public class HomeFragment extends Fragment implements MusicSyncTask.TaskCompletedListener{
+public class HomeFragment extends Fragment implements MusicSyncTask.TaskCompletedListener,
+        SongSelectedListener{
 
     private OnFragmentInteractionListener mListener;
 
@@ -37,9 +41,7 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
     private GridLayoutManager layoutManager;
 
     public HomeFragment() {
-        // Required empty public constructor
     }
-
 
 
     @Override
@@ -59,7 +61,7 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
         songView.setLayoutManager(layoutManager);
         songView.setHasFixedSize(true);
 
-
+        MusicSyncTask.setListener(this);
         MusicSyncTask.initialize(getActivity());
         new MusicAysncTask().execute();
 
@@ -82,6 +84,20 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onSongSelectedListener(int postion) {
+        Bundle args = new Bundle();
+        args.putParcelableArrayList("songs",tracks);
+        args.putInt("position",postion);
+        PlayFragment playFragment = new PlayFragment();
+        playFragment.setArguments(args);
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.fragment_container, playFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 
 
@@ -116,10 +132,9 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
                     } while (cursor.moveToNext());
                 }
                 tracks = songs;
-                musicAdapter = new MusicAdapter(getActivity(), tracks);
+                musicAdapter = new MusicAdapter(HomeFragment.this);
+                musicAdapter.setMusicList(tracks);
                 songView.setAdapter(musicAdapter);
-
-
             }
         }
     }
