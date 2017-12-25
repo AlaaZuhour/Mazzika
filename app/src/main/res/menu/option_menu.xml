@@ -3,13 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/music"
+        android:id="@+id/logout"
         android:icon="@drawable/music"
-        android:title="Item"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/end"
-        android:icon="@drawable/exit"
-        android:title="Item"
-        app:showAsAction="never|always" />
+        android:title="Log out"
+        app:showAsAction="never" />
 </menu>

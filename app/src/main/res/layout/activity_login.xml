@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
+    android:background="@drawable/login_back"
+    android:gravity="bottom"
     android:orientation="vertical"
     tools:context="com.udacity.capstone.musicapp.ui.SignUpActivity">
 
@@ -16,7 +17,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:layout_weight="1.8"
         android:textColorHint="?android:attr/textColorHint">
 
         <android.support.v7.widget.AppCompatEditText
@@ -42,7 +42,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="16dp"
-        android:layout_weight="1.8"
         android:textColorHint="?android:attr/textColorHint">
 
         <android.support.v7.widget.AppCompatEditText
@@ -63,15 +62,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="16dp"
-        android:layout_weight="1"
+        android:background="@color/colorAccent"
         android:text="@string/sign_up" />
 
     <TextView
         android:id="@+id/login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1.8"
+        android:layout_margin="16dp"
         android:gravity="center"
         android:text="@string/login"
-        android:textColor="@color/common_google_signin_btn_text_dark_focused" />
+        android:textColor="@color/theam_gray" />
 </LinearLayout>

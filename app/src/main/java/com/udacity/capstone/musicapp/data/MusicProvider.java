@@ -14,6 +14,8 @@ public class MusicProvider extends ContentProvider {
 
     static final int MUSIC = 100;
     static final int MUSIC_WITH_ID = 101;
+    static final int PLAYLIST = 200;
+    static final int PLAYLIST_WITH_ID = 201;
     private MusicDbHelper musicDbHelper;
     public static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -21,6 +23,8 @@ public class MusicProvider extends ContentProvider {
         UriMatcher uri = new UriMatcher(UriMatcher.NO_MATCH);
         uri.addURI(MusicContract.CONTENT_AUTHORITY,MusicContract.PATH_MUSIC,MUSIC);
         uri.addURI(MusicContract.CONTENT_AUTHORITY,MusicContract.PATH_MUSIC+"/#",MUSIC_WITH_ID);
+        uri.addURI(MusicContract.CONTENT_AUTHORITY,MusicContract.PATH_PLAYLIST,PLAYLIST);
+        uri.addURI(MusicContract.CONTENT_AUTHORITY,MusicContract.PATH_PLAYLIST+"/#",PLAYLIST_WITH_ID);
 
         return uri;
     }
@@ -40,6 +44,23 @@ public class MusicProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long id = sqLiteDatabase.insert(MusicContract.MusicEntry.TABLE_NAME, null, value);
+                        if (id != -1)
+                            rowInserted++;
+                    }
+                    sqLiteDatabase.setTransactionSuccessful();
+                } finally {
+                    sqLiteDatabase.endTransaction();
+                }
+                if (rowInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowInserted;
+            case PLAYLIST:
+                sqLiteDatabase.beginTransaction();
+                try {
+                    for (ContentValues value : values) {
+                        long id = sqLiteDatabase.insert(MusicContract.PlaylistEntry.TABLE_NAME, null, value);
                         if (id != -1)
                             rowInserted++;
                     }
@@ -75,6 +96,20 @@ public class MusicProvider extends ContentProvider {
                         projection, MusicContract.MusicEntry._ID + " = ? ", selectionArg,
                         null, null, sortOrder);
                 break;
+            case PLAYLIST:
+                retCursor = sqLiteDatabase.query(MusicContract.PlaylistEntry.TABLE_NAME,
+                        projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case PLAYLIST_WITH_ID:
+                String id1 = uri.getLastPathSegment();
+                String[] selectionArg1 = {id1};
+                retCursor = sqLiteDatabase.query(MusicContract.MusicEntry.TABLE_NAME,
+                        projection, MusicContract.PlaylistEntry.COLUMN_PLAYLIST_ID + " = ? ", selectionArg1,
+                        null, null, sortOrder);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
@@ -89,6 +124,7 @@ public class MusicProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
+
         return null;
     }
 
@@ -107,6 +143,10 @@ public class MusicProvider extends ContentProvider {
                         MusicContract.MusicEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case PLAYLIST:
+                rowsDeleted = db.delete(
+                        MusicContract.PlaylistEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

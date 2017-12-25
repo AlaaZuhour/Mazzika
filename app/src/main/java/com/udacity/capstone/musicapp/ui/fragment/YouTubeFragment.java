@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,6 +24,7 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.udacity.capstone.musicapp.R;
+import com.udacity.capstone.musicapp.data.DataManeger;
 import com.udacity.capstone.musicapp.model.Item;
 import com.udacity.capstone.musicapp.model.SearchResponse;
 import com.udacity.capstone.musicapp.retrofit.ITube;
@@ -32,6 +34,8 @@ import com.udacity.capstone.musicapp.ui.adapter.MusicAdapter;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,11 +46,18 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
     private OnFragmentInteractionListener mListener;
 
     private SearchResponse searchResponse;
-    private RecyclerView mRecyclerView;
+    private ArrayList<Item> itemArrayList;
     private MusicAdapter musicAdapter;
-    private GridLayoutManager layoutManager;
-    private Button searchButton;
-    private EditText searchText;
+
+    @BindView(R.id.search_list)
+    RecyclerView mRecyclerView;
+
+    @BindView(R.id.search_button)
+    Button searchButton;
+
+    @BindView(R.id.search_word)
+    EditText searchText;
+
     public YouTubeFragment() {
         // Required empty public constructor
     }
@@ -62,35 +73,43 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_you_tube, container, false);
-        mRecyclerView = view.findViewById(R.id.search_list);
-        searchButton = view.findViewById(R.id.search_button);
-        searchText = view.findViewById(R.id.search_word);
-        FirebaseAuth auth= FirebaseAuth.getInstance();
-        auth.signOut();
+        ButterKnife.bind(this,view);
+
         int ot = getResources().getConfiguration().orientation;
-        layoutManager =
-                new GridLayoutManager(getActivity(),ot == Configuration.ORIENTATION_LANDSCAPE ? 4 : 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), ot == Configuration.ORIENTATION_LANDSCAPE ? 4 : 2);
         mRecyclerView.setLayoutManager(layoutManager);
-        searchButton.setOnClickListener(v -> {
-            ITube youtubeService = RetrofitBuilder.RetrieveITube();
-            searchResponse = new SearchResponse();
-            Call<SearchResponse> call = youtubeService.getVideosList(searchText.getText().toString());
-            call.enqueue(new Callback<SearchResponse>() {
-                @Override
-                public void onResponse(@NonNull Call<SearchResponse> call, @NonNull Response<SearchResponse> response) {
-                   searchResponse = response.body();
-                   musicAdapter = new MusicAdapter(YouTubeFragment.this);
-                   musicAdapter.setList((ArrayList<Item>) searchResponse.getItems());
-                   mRecyclerView.setAdapter(musicAdapter);
-                }
-                @Override
-                public void onFailure(@NonNull Call<SearchResponse> call, @NonNull Throwable t) {
-                    Log.d("response","fail");
-                }
+        if (savedInstanceState != null) {
+            itemArrayList = savedInstanceState.getParcelableArrayList("items");
+            prepareAdapter();
+        }else {
+
+            searchButton.setOnClickListener(v -> {
+                ITube youtubeService = RetrofitBuilder.RetrieveITube();
+                searchResponse = new SearchResponse();
+                Call<SearchResponse> call = youtubeService.getVideosList(searchText.getText().toString());
+                call.enqueue(new Callback<SearchResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<SearchResponse> call, @NonNull Response<SearchResponse> response) {
+                        searchResponse = response.body();
+                        itemArrayList = (ArrayList<Item>) searchResponse.getItems();
+                       prepareAdapter();
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<SearchResponse> call, @NonNull Throwable t) {
+                        Log.d("response", "fail");
+                    }
+                });
             });
-        });
+        }
 
         return view;
+    }
+
+    private void prepareAdapter() {
+        musicAdapter = new MusicAdapter(YouTubeFragment.this);
+        musicAdapter.setList(itemArrayList);
+        mRecyclerView.setAdapter(musicAdapter);
     }
 
 
@@ -109,6 +128,13 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("items", itemArrayList);
+
     }
 
     @Override

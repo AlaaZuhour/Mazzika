@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/playlist"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:icon="@drawable/playlist_play_white"
         android:title="@string/playlist" />
 
     <item
@@ -20,4 +20,9 @@
         android:id="@+id/youtube"
         android:icon="@android:drawable/ic_menu_search"
         android:title="@string/youtube" />
+
+    <item
+        android:id="@+id/artiste"
+        android:icon="@android:drawable/presence_audio_away"
+        android:title="@string/artist" />
 </menu>

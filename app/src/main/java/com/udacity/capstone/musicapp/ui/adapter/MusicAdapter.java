@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,20 +17,27 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.udacity.capstone.musicapp.R;
 import com.udacity.capstone.musicapp.model.Item;
+import com.udacity.capstone.musicapp.model.Playlist;
 import com.udacity.capstone.musicapp.model.PriorityQueue;
 import com.udacity.capstone.musicapp.model.Song;
 import com.udacity.capstone.musicapp.ui.SongSelectedListener;
+import com.udacity.capstone.musicapp.ui.fragment.PlayListFragment;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.RecyclerViewHolder>{
     private ArrayList<Song> musicList;
     private ArrayList<Item> itemList;
-    private boolean isSearch;
+    private ArrayList<Playlist> playlists;
+    private boolean isSearch, isPlaylist;
     private Context mContext;
     private SongSelectedListener mListener;
+
+
 
     public MusicAdapter(@NonNull Context context, ArrayList<Song> music) {
         this.musicList= music;
@@ -47,12 +55,19 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.RecyclerView
     public void setList(ArrayList<Item> items){
         this.itemList = items;
         isSearch = true;
+        isPlaylist = false;
     }
     public void setMusicList(ArrayList<Song> songs){
         this.musicList = songs;
         isSearch =false;
+        isPlaylist = false;
     }
 
+    public void setPlaylists(ArrayList<Playlist> playlists1){
+        this.playlists = playlists1;
+        isPlaylist = true;
+        isSearch = false;
+    }
 
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -70,7 +85,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.RecyclerView
             Item currentItem = itemList.get(position);
             holder.title.setText(currentItem.getSnippet().getTitle());
             Glide.with(mContext).load(currentItem.getSnippet().getThumbnails().getDefault().getUrl()).into(holder.imageView);
-        }else {
+        }else if(isPlaylist){
+            Playlist playlist = playlists.get(position);
+            holder.title.setText(playlist.getName());
+            holder.imageView.setImageResource(R.drawable.library_music);
+            holder.floatingActionButton.setImageResource(R.drawable.ic_shuffle_white_36dp);
+        }else{
             Song current = musicList.get(position);
             holder.title.setText(current.getTitle());
             holder.art.setText(current.getArtist());
@@ -82,6 +102,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.RecyclerView
     public int getItemCount() {
         if(isSearch){
             return itemList.size();
+        }else if(isPlaylist){
+            return playlists.size();
         }else {
             return musicList.size();
         }
@@ -89,14 +111,22 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.RecyclerView
 
     public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        TextView title,art;
+        @BindView(R.id.song_title)
+        TextView title;
+
+        @BindView(R.id.artiste_name)
+        TextView art;
+
+        @BindView(R.id.thumbnail)
         ImageView imageView;
+
+        @BindView(R.id.floatingActionButton)
+        FloatingActionButton floatingActionButton;
 
         public RecyclerViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.song_title);
-            art =  itemView.findViewById(R.id.artiste_name);
-            imageView = itemView.findViewById(R.id.thumbnail);
+            ButterKnife.bind(this,itemView);
+
             itemView.setOnClickListener(this);
         }
 

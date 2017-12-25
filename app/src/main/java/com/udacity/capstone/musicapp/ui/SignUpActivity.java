@@ -16,11 +16,23 @@ import com.udacity.capstone.musicapp.utilities.DataValidator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText email,password;
-    private TextView login;
-    private Button signUp;
+    @BindView(R.id.email_address)
+    EditText email;
+
+    @BindView(R.id.password)
+    EditText password;
+
+    @BindView(R.id.login)
+    TextView login;
+
+    @BindView(R.id.sign_up)
+    Button signUp;
+
     private FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +40,12 @@ public class SignUpActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
-        email = findViewById(R.id.email_address);
-        password = findViewById(R.id.password);
-        login = findViewById(R.id.login);
         login.setOnClickListener(v->{
             startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
             finish();
         });
-        signUp = findViewById(R.id.sign_up);
         signUp.setOnClickListener(v->{
 
             String emailText = email.getText().toString().trim();

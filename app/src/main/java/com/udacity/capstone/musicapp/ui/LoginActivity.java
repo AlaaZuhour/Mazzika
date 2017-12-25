@@ -15,11 +15,23 @@ import com.google.firebase.auth.FirebaseUser;
 import com.udacity.capstone.musicapp.R;
 import com.udacity.capstone.musicapp.utilities.DataValidator;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText email,password;
-    private TextView login;
-    private Button signUp;
+    @BindView(R.id.email_address)
+    EditText email;
+
+    @BindView(R.id.password)
+    EditText password;
+
+    @BindView(R.id.login)
+    TextView login;
+
+    @BindView(R.id.sign_up)
+    Button signUp;
+
     private FirebaseAuth auth;
 
     @Override
@@ -32,16 +44,13 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
-        email = findViewById(R.id.email_address);
-        password = findViewById(R.id.password);
-        login = findViewById(R.id.login);
         login.setText(getString(R.string.sign_up));
         login.setOnClickListener(v->{
             startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
             finish();
         });
-        signUp = findViewById(R.id.sign_up);
         signUp.setText(getString(R.string.login));
         signUp.setOnClickListener(v->{
 

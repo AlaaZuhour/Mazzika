@@ -10,6 +10,9 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class Song implements Parcelable{
+
+    @SerializedName("trackId")
+    @Expose
     private int id;
 
     private int priority ;
@@ -30,6 +33,7 @@ public class Song implements Parcelable{
     @Expose
     private String imageUrl;
 
+    private int playListId;
     private boolean isFavorit;
     public Song(){
 
@@ -42,6 +46,7 @@ public class Song implements Parcelable{
         artist = in.readString();
         streamUrl = in.readString();
         imageUrl = in.readString();
+        playListId = in.readInt();
         isFavorit = in.readByte() != 0;
     }
 
@@ -56,6 +61,14 @@ public class Song implements Parcelable{
             return new Song[size];
         }
     };
+
+    public int getPlayListId() {
+        return playListId;
+    }
+
+    public void setPlayListId(int playListId) {
+        this.playListId = playListId;
+    }
 
     public String getImageUrl() {
         return imageUrl;
@@ -118,6 +131,7 @@ public class Song implements Parcelable{
         dest.writeString(artist);
         dest.writeString(streamUrl);
         dest.writeString(imageUrl);
+        dest.writeInt(playListId);
         dest.writeByte((byte) (isFavorit ? 1 : 0));
     }
 }

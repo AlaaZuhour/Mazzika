@@ -1,7 +1,10 @@
 package com.udacity.capstone.musicapp.ui;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
@@ -25,6 +28,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.udacity.capstone.musicapp.data.DataManeger;
 import com.udacity.capstone.musicapp.model.Song;
 
 import java.util.ArrayList;
@@ -32,11 +36,15 @@ import java.util.ArrayList;
 import com.udacity.capstone.musicapp.model.PriorityQueue;
 
 public class MusicService extends Service implements ExoPlayer.EventListener {
-    //media player
+
+    public static final String NEXT_ACTION = "com.udacity.mazzika.next";
+    public static final String PREVIOUS_ACTION = "com.udacity.mazzika.previous";
+    public static final String TOGGLEPAUSE_ACTION = "com.udacity.mazzika.togglepause";
     private SimpleExoPlayer mExoPlayer;
     private final IBinder musicBind = new MusicBinder();
     private ArrayList<Song> songs;
-
+    private Song playSong;
+    private WidgetReceiver mWidgetReceiver;
     //current position
     private int songPosn=0;
 
@@ -45,7 +53,14 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     public void onCreate(){
         super.onCreate();
         songPosn=0;
+        mWidgetReceiver = new WidgetReceiver();
         initMusicPlayer();
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(TOGGLEPAUSE_ACTION);
+        filter.addAction(NEXT_ACTION);
+        filter.addAction(PREVIOUS_ACTION);
+        registerReceiver(mWidgetReceiver, filter);
+
     }
 
     public SimpleExoPlayer getExoPlayer() {
@@ -80,6 +95,7 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
        if(playbackState == ExoPlayer.STATE_ENDED){
+           prepareIntent();
            playNext();
        }
     }
@@ -139,16 +155,30 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
 
     }
     public void playSong(){
-             Song playSong = songs.get(songPosn);
-             MediaSource mediaSource1 = buildMediaSource(playSong.getStreamUrl());
-             mExoPlayer.prepare(mediaSource1);
-             mExoPlayer.setPlayWhenReady(true);
-
+        if(songs == null) {
+            songs = DataManeger.querySongs(this);
+        }
+        playSong = songs.get(songPosn);
+        MediaSource mediaSource1 = buildMediaSource(playSong.getStreamUrl());
+        mExoPlayer.prepare(mediaSource1);
+        mExoPlayer.setPlayWhenReady(true);
+        prepareIntent();
     }
+
+    private void prepareIntent() {
+        Intent musicIntent = new Intent();
+        musicIntent.putExtra("name",playSong.getTitle());
+        musicIntent.putExtra("artist",playSong.getArtist());
+        musicIntent.putExtra("playing",mExoPlayer.getPlayWhenReady());
+        sendStickyBroadcast(musicIntent);
+    }
+
+
     @Override
     public boolean onUnbind(Intent intent){
         mExoPlayer.stop();
         mExoPlayer.release();
+        unregisterReceiver(mWidgetReceiver);
         return false;
     }
 
@@ -156,23 +186,45 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
         mExoPlayer.setPlayWhenReady(false);
     }
 
+    public boolean isPlaying(){
+        return mExoPlayer.getPlayWhenReady();
+    }
+    public void play(){
+        mExoPlayer.setPlayWhenReady(true);
+    }
     public void playNext(){
         int newPos = ++songPosn;
-        if(newPos < songs.size()){
-            songPosn += songPosn;
-        }else{
+        if(newPos >= songs.size()){
             songPosn=0;
         }
         playSong();
     }
 
+    public int getSongPosn() {
+        return songPosn;
+    }
+
     public void playPrev(){
         int newPos = --songPosn;
-        if(newPos > 0){
-            songPosn -= songPosn;
-        }else{
+        if(newPos < 0){
             songPosn=0;
         }
         playSong();
+    }
+
+    public class WidgetReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(NEXT_ACTION)) {
+                playNext();
+            }else if(intent.getAction().equals(PREVIOUS_ACTION)){
+                playPrev();
+            }else if(intent.getAction().equals(TOGGLEPAUSE_ACTION)){
+                if(mExoPlayer.getPlaybackState() == ExoPlayer.STATE_READY){
+
+                }
+            }
+        }
     }
 }
