@@ -1,15 +1,20 @@
 package com.udacity.capstone.musicapp.ui;
 
+import android.app.PendingIntent;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -28,12 +33,14 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.udacity.capstone.musicapp.R;
 import com.udacity.capstone.musicapp.data.DataManeger;
 import com.udacity.capstone.musicapp.model.Song;
 
 import java.util.ArrayList;
 
 import com.udacity.capstone.musicapp.model.PriorityQueue;
+import com.udacity.capstone.musicapp.widget.MusicPlayerWidget;
 
 public class MusicService extends Service implements ExoPlayer.EventListener {
 
@@ -44,7 +51,6 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     private final IBinder musicBind = new MusicBinder();
     private ArrayList<Song> songs;
     private Song playSong;
-    private WidgetReceiver mWidgetReceiver;
     //current position
     private int songPosn=0;
 
@@ -53,13 +59,7 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     public void onCreate(){
         super.onCreate();
         songPosn=0;
-        mWidgetReceiver = new WidgetReceiver();
         initMusicPlayer();
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(TOGGLEPAUSE_ACTION);
-        filter.addAction(NEXT_ACTION);
-        filter.addAction(PREVIOUS_ACTION);
-        registerReceiver(mWidgetReceiver, filter);
 
     }
 
@@ -166,11 +166,7 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     }
 
     private void prepareIntent() {
-        Intent musicIntent = new Intent();
-        musicIntent.putExtra("name",playSong.getTitle());
-        musicIntent.putExtra("artist",playSong.getArtist());
-        musicIntent.putExtra("playing",mExoPlayer.getPlayWhenReady());
-        sendStickyBroadcast(musicIntent);
+
     }
 
 
@@ -178,7 +174,6 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     public boolean onUnbind(Intent intent){
         mExoPlayer.stop();
         mExoPlayer.release();
-        unregisterReceiver(mWidgetReceiver);
         return false;
     }
 
@@ -193,6 +188,9 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
         mExoPlayer.setPlayWhenReady(true);
     }
     public void playNext(){
+        if(songs == null) {
+            songs = DataManeger.querySongs(this);
+        }
         int newPos = ++songPosn;
         if(newPos >= songs.size()){
             songPosn=0;
@@ -205,6 +203,9 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
     }
 
     public void playPrev(){
+        if(songs == null) {
+            songs = DataManeger.querySongs(this);
+        }
         int newPos = --songPosn;
         if(newPos < 0){
             songPosn=0;
@@ -212,19 +213,36 @@ public class MusicService extends Service implements ExoPlayer.EventListener {
         playSong();
     }
 
-    public class WidgetReceiver extends BroadcastReceiver{
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
+        if(intent.getAction() != null) {
             if (intent.getAction().equals(NEXT_ACTION)) {
                 playNext();
-            }else if(intent.getAction().equals(PREVIOUS_ACTION)){
+            } else if (intent.getAction().equals(PREVIOUS_ACTION)) {
                 playPrev();
-            }else if(intent.getAction().equals(TOGGLEPAUSE_ACTION)){
-                if(mExoPlayer.getPlaybackState() == ExoPlayer.STATE_READY){
-
+            } else if (intent.getAction().equals(TOGGLEPAUSE_ACTION)) {
+                if (mExoPlayer.getPlayWhenReady()) {
+                    pause();
+                }else {
+                    playSong();
                 }
             }
         }
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, MusicPlayerWidget.class));
+        //Now update all widgets
+        Bundle bundle= null;
+        if(playSong != null) {
+            bundle = new Bundle();
+            bundle.putString("name", playSong.getTitle());
+            bundle.putString("artist", playSong.getArtist());
+            bundle.putBoolean("playing", mExoPlayer.getPlayWhenReady());
+        }
+        MusicPlayerWidget.onUpdate(this, appWidgetManager, appWidgetIds,bundle);
+
+        return super.onStartCommand(intent,flags,startId);
+
     }
+
 }

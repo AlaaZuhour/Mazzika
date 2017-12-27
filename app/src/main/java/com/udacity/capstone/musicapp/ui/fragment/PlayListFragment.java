@@ -109,12 +109,12 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
         edt = dialogView.findViewById(R.id.playlist_name);
         dialogBuilder.setTitle(getString(R.string.new_playlist));
         dialogBuilder.setMessage(getString(R.string.new_playlist_name));
-        dialogBuilder.setPositiveButton("Done", (dialog, whichButton) -> {
+        dialogBuilder.setPositiveButton(getString(R.string.done), (dialog, whichButton) -> {
             addPlaylist(edt.getText().toString());
             openAddSongsDialog(edt.getText().toString());
             noPlaylists.setVisibility(View.GONE);
         });
-        dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) ->
+        dialogBuilder.setNegativeButton(getString(R.string.cancel), (dialog, whichButton) ->
                 dialog.dismiss());
         AlertDialog b = dialogBuilder.create();
         b.show();
@@ -133,12 +133,12 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
         dialogBuilder.setTitle(getString(R.string.add_songs));
         dialogBuilder.setMessage(String.format(getString(R.string.add_playlist_songs), s));
 
-        dialogBuilder.setPositiveButton("Done", (dialog, whichButton) -> {
+        dialogBuilder.setPositiveButton(getString(R.string.done), (dialog, whichButton) -> {
             ArrayList<Song> selectedSongs = selectionAdaptor.getSelectedList();
             updateSongs(selectedSongs);
         });
 
-        dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) ->
+        dialogBuilder.setNegativeButton(getString(R.string.cancel), (dialog, whichButton) ->
                 dialog.dismiss());
         AlertDialog b = dialogBuilder.create();
         b.show();
@@ -175,12 +175,6 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override

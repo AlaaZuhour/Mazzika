@@ -180,12 +180,6 @@ public class PlayFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
@@ -243,6 +237,7 @@ public class PlayFragment extends Fragment implements View.OnClickListener{
         if(musicSrv.getExoPlayer() != null){
             playerPostion = musicSrv.getExoPlayer().getCurrentPosition();
         }
+        musicSrv.pause();
         super.onPause();
     }
 
@@ -299,12 +294,12 @@ public class PlayFragment extends Fragment implements View.OnClickListener{
 
         dialogBuilder.setTitle(getString(R.string.choose_playlist));
 
-        dialogBuilder.setPositiveButton("Done", (dialog, whichButton) -> {
+        dialogBuilder.setPositiveButton(getString(R.string.done), (dialog, whichButton) -> {
             Playlist selectedPlayList = selectionAdaptor.getSelectedList();
             updatePlayLists(selectedPlayList);
         });
 
-        dialogBuilder.setNegativeButton("Cancel", (dialog, whichButton) ->
+        dialogBuilder.setNegativeButton(getString(R.string.cancel), (dialog, whichButton) ->
                 dialog.dismiss());
         AlertDialog b = dialogBuilder.create();
         b.show();

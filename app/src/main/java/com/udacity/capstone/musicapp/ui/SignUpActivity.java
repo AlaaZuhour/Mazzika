@@ -53,8 +53,10 @@ public class SignUpActivity extends AppCompatActivity {
 
             if(!DataValidator.isValidEmail(emailText)){
                 email.setError(getString(R.string.invalid_email));
+                return;
             }else if(!DataValidator.isValidPassword(passwordText)){
                 password.setError(getString(R.string.invalid_password));
+                return;
             }
 
             auth.createUserWithEmailAndPassword(emailText,passwordText)

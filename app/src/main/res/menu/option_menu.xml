@@ -5,6 +5,6 @@
     <item
         android:id="@+id/logout"
         android:icon="@drawable/music"
-        android:title="Log out"
+        android:title="@string/logout"
         app:showAsAction="never" />
 </menu>

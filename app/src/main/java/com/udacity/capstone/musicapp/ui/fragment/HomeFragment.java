@@ -2,15 +2,18 @@ package com.udacity.capstone.musicapp.ui.fragment;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.net.Uri;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.content.CursorLoader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,12 +40,13 @@ import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
 
 public class HomeFragment extends Fragment implements MusicSyncTask.TaskCompletedListener,
-        SongSelectedListener {
+        SongSelectedListener, LoaderManager.LoaderCallbacks<Cursor>{
 
 
     @BindView(R.id.songs_list)
     RecyclerView songView;
 
+    private static final int MOVIE_LOADER_ID = 22;
     private int recyclerPostion;
     private ArrayList<Song> tracks;
     public MusicAdapter musicAdapter;
@@ -79,7 +83,7 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         ButterKnife.bind(this, rootView);
-
+        ((MainActivity)getActivity()).mFragmentState = FragmentState.Home;
         int ot = getResources().getConfiguration().orientation;
         layoutManager =
                 new GridLayoutManager(getActivity(), ot == Configuration.ORIENTATION_LANDSCAPE ? 4 : 2);
@@ -89,18 +93,22 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
 
         if (savedInstanceState != null) {
             tracks = savedInstanceState.getParcelableArrayList("songs");
-            prepareAdapter();
+            if (tracks != null ) {
+                prepareAdapter();
+            }
         }
 
         if (getArguments() != null) {
             tracks = getArguments().getParcelableArrayList("songs");
-            prepareAdapter();
+            if (tracks == null || tracks.size() == 0) {
+                prepareAdapter();
+            }
             getArguments().clear();
         }
         MusicSyncTask.setListener(this);
         MusicSyncTask.initialize(getActivity());
         if (tracks == null || tracks.size() == 0) {
-            new MusicAysncTask().execute();
+            getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
 
         }else {
             prepareAdapter();
@@ -113,12 +121,6 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
 
@@ -172,27 +174,48 @@ public class HomeFragment extends Fragment implements MusicSyncTask.TaskComplete
         super.onResume();
     }
 
-
-    private class MusicAysncTask extends AsyncTask<Void, Void, ArrayList<Song>> {
-
-        @Override
-        protected ArrayList<Song> doInBackground(Void... voids) {
-
-            return DataManeger.querySongs(getActivity());
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Song> songs) {
-
-            tracks = songs;
-            prepareAdapter();
-
-        }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), MusicContract.MusicEntry.CONTENT_URI,
+                null,null,null,null);
     }
 
     @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        ArrayList<Song> songs = new ArrayList<>();
+        if (cursor != null || cursor.getCount() != 0) {
+
+            if (cursor.moveToFirst()) {
+                do {
+                    Song song = new Song();
+                    song.setId(cursor.getInt(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_SONG_ID)));
+                    song.setArtist(cursor.getString(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_SONG_ARTIST)));
+                    song.setTitle(cursor.getString(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_SONG_TITLE)));
+                    song.setStreamUrl(cursor.getString(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_SONG_URL)));
+                    song.setImageUrl(cursor.getString(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_IMAGE_URL)));
+                    song.setFavorit(cursor.getInt(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_FAVORIT)) > 0);
+                    song.setPlayListId(cursor.getInt(cursor.getColumnIndex(MusicContract.MusicEntry.COLUMN_PLAYLIST_ID)));
+                    songs.add(song);
+
+                } while (cursor.moveToNext());
+            }
+        }
+
+        tracks = songs;
+        prepareAdapter();
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
+
+
+    @Override
     public void onDownloadFinished(String art) {
-        new MusicAysncTask().execute();
+        getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
     }
 
     public void prepareAdapter() {

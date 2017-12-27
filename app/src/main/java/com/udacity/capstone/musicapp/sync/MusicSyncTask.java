@@ -11,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import com.udacity.capstone.musicapp.R;
 import com.udacity.capstone.musicapp.data.DataManeger;
 import com.udacity.capstone.musicapp.data.MusicContract;
 import com.udacity.capstone.musicapp.model.Song;
@@ -55,7 +56,7 @@ public class MusicSyncTask {
         mContext = context;
         if(!isDeviceOnline()){
             View view =  ((MainActivity)context).findViewById(android.R.id.content).getRootView();
-            final Snackbar snackbar = Snackbar.make(view, "No Internet Connection Available", Snackbar.LENGTH_LONG);
+            final Snackbar snackbar = Snackbar.make(view, context.getString(R.string.no_internet), Snackbar.LENGTH_LONG);
 
             snackbar.show();
             return;
@@ -67,7 +68,6 @@ public class MusicSyncTask {
             @Override
             public void onResponse(@NonNull Call<SongResponse> call, @NonNull Response<SongResponse> response) {
                 songResponse = response.body();
-                Log.d("response","sucsses");
                 ContentValues[] contentValues = new ContentValues[songResponse.songArrayList.size()+1];
 
                 for(int i=1;i<contentValues.length-1;){
@@ -84,7 +84,7 @@ public class MusicSyncTask {
 
                 }
                 DataManeger.addSongs(context,contentValues);
-                mListener.onDownloadFinished("mix");
+                mListener.onDownloadFinished(context.getString(R.string.mix));
             }
 
             @Override
@@ -98,7 +98,7 @@ public class MusicSyncTask {
         mContext = context;
         if(!isDeviceOnline()){
             View view =  ((MainActivity)context).findViewById(android.R.id.content).getRootView();
-            final Snackbar snackbar = Snackbar.make(view, "No Internet Connection Available", Snackbar.LENGTH_LONG);
+            final Snackbar snackbar = Snackbar.make(view, context.getString(R.string.no_internet), Snackbar.LENGTH_LONG);
 
             snackbar.show();
             return;
@@ -109,7 +109,6 @@ public class MusicSyncTask {
             @Override
             public void onResponse(@NonNull Call<SongResponse> call, @NonNull Response<SongResponse> response) {
                 songResponse = response.body();
-                Log.d("response","sucsses");
                 ContentValues[] contentValues = new ContentValues[songResponse.songArrayList.size()+1];
 
                 for(int i=1;i<contentValues.length-1;){
@@ -126,12 +125,11 @@ public class MusicSyncTask {
 
                 }
                 DataManeger.addSongs(context,contentValues);
-                mListener.onDownloadFinished("maher");
+                mListener.onDownloadFinished(context.getString(R.string.maher));
             }
 
             @Override
             public void onFailure(@NonNull Call<SongResponse> call, @NonNull Throwable t) {
-                Log.d("response","fail");
             }
         });
 
@@ -142,7 +140,7 @@ public class MusicSyncTask {
         mContext = context;
         if(!isDeviceOnline()){
             View view =  ((MainActivity)context).findViewById(android.R.id.content).getRootView();
-            final Snackbar snackbar = Snackbar.make(view, "No Internet Connection Available", Snackbar.LENGTH_LONG);
+            final Snackbar snackbar = Snackbar.make(view,context.getString(R.string.no_internet), Snackbar.LENGTH_LONG);
 
             snackbar.show();
             return;
@@ -153,7 +151,6 @@ public class MusicSyncTask {
             @Override
             public void onResponse(@NonNull Call<SongResponse> call, @NonNull Response<SongResponse> response) {
                 songResponse = response.body();
-                Log.d("response","sucsses");
                 ContentValues[] contentValues = new ContentValues[songResponse.songArrayList.size()+1];
 
                 for(int i=1;i<contentValues.length-1;){
@@ -170,12 +167,11 @@ public class MusicSyncTask {
 
                 }
                 DataManeger.addSongs(context,contentValues);
-                mListener.onDownloadFinished("mesut");
+                mListener.onDownloadFinished(context.getString(R.string.mesut));
             }
 
             @Override
             public void onFailure(@NonNull Call<SongResponse> call, @NonNull Throwable t) {
-                Log.d("response","fail");
 
             }
         });

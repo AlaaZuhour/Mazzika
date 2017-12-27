@@ -127,9 +127,9 @@ public class ArtistFragment extends Fragment implements MusicSyncTask.TaskComple
 
     @Override
     public void onDownloadFinished(String artiste) {
-        if(artiste.equals("mesut")){
+        if(artiste.equals(getString(R.string.mesut))){
             songs = DataManeger.querySongs(getActivity(),"Mesut Kurtis");
-        }else if(artiste.equals("maher")){
+        }else if(artiste.equals(getString(R.string.maher))){
             songs =DataManeger.querySongs(getActivity(),"Maher Zain");
         }else {
             songs = DataManeger.querySongs(getActivity());

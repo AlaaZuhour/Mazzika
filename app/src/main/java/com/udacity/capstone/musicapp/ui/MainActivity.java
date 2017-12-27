@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private FavoriteFragment favoriteFragment;
     public FragmentState mFragmentState;
     private boolean fromSavedInstanceState;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -66,9 +67,9 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.logout:
-                    if(auth.getCurrentUser() != null){
+                    if (auth.getCurrentUser() != null) {
                         auth.signOut();
-                        startActivity(new Intent(this,LoginActivity.class));
+                        startActivity(new Intent(this, LoginActivity.class));
                         finish();
                     }
                     break;
@@ -77,12 +78,12 @@ public class MainActivity extends AppCompatActivity {
         });
         toolbar.setNavigationOnClickListener(v -> {
             FragmentManager fm = getFragmentManager();
-            Fragment currentFragment =  fm.findFragmentById(R.id.fragment_container);
-            if (currentFragment!=null) {
-                if(currentFragment instanceof HomeFragment){
+            Fragment currentFragment = fm.findFragmentById(R.id.fragment_container);
+            if (currentFragment != null) {
+                if (currentFragment instanceof HomeFragment) {
                     return;
-                }else {
-                    fm.popBackStack(null,0);
+                } else {
+                    fm.popBackStack(null, 0);
                 }
             }
 
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             mFragmentState = FragmentState.values()[savedInstanceState.getInt(FRAGMENT_SAVED_STATE)];
             setFragmentState(mFragmentState);
             switch (mFragmentState) {
@@ -100,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case Play:
                     playFragment = (PlayFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
-                    showPlayFragment();
                     break;
                 case Favorite:
                     favoriteFragment = (FavoriteFragment) getFragmentManager().findFragmentById(R.id.fragment_container);
@@ -124,20 +124,20 @@ public class MainActivity extends AppCompatActivity {
             if (homeFragment != null) {
                 homeFragment.setRecyclerPostion(savedInstanceState.getInt("recycler"));
             }
-             if(playFragment != null){
+            if (playFragment != null) {
                 playFragment.setPlayerPostion(savedInstanceState.getLong("player"));
                 playFragment.setSongPos(savedInstanceState.getInt("position"));
             }
-            if(favoriteFragment != null){
-                 favoriteFragment.setRecyclerPostion(savedInstanceState.getInt("recycler_favorite"));
+            if (favoriteFragment != null) {
+                favoriteFragment.setRecyclerPostion(savedInstanceState.getInt("recycler_favorite"));
             }
 
 
         }
 
-            BottomNavigationView navigation = findViewById(R.id.navigation);
-            navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        if(savedInstanceState == null) {
+        BottomNavigationView navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        if (savedInstanceState == null) {
             navigation.setSelectedItemId(R.id.home);
         }
 
@@ -148,18 +148,18 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if(homeFragment != null) {
+        if (homeFragment != null) {
             outState.putInt("recycler", homeFragment.getRecyclerPostion());
         }
-         if(playFragment != null){
-            outState.putInt("position",playFragment.getSongPos());
-            outState.putLong("player",playFragment.getPlayerPostion());
+        if (playFragment != null) {
+            outState.putInt("position", playFragment.getSongPos());
+            outState.putLong("player", playFragment.getPlayerPostion());
         }
-        if(favoriteFragment != null){
-            outState.putInt("recycler_favorite",favoriteFragment.getRecyclerPostion());
+        if (favoriteFragment != null) {
+            outState.putInt("recycler_favorite", favoriteFragment.getRecyclerPostion());
         }
 
-        outState.putInt(FRAGMENT_SAVED_STATE,mFragmentState.ordinal());
+        outState.putInt(FRAGMENT_SAVED_STATE, mFragmentState.ordinal());
 
 
     }
@@ -196,50 +196,50 @@ public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = item -> {
-                switch (item.getItemId()) {
-                    case R.id.playlist:
-                        setFragmentState(FragmentState.PlayList);
-                        return true;
-                    case R.id.favorite:
-                        setFragmentState(FragmentState.Favorite);
-                        return true;
-                    case R.id.home:
-                        setFragmentState(FragmentState.Home);
-                        return true;
-                    case R.id.youtube:
-                        setFragmentState(FragmentState.YouTube);
-                        return true;
-                    case R.id.artiste:
-                        setFragmentState(FragmentState.Artist);
-                        return true;
-                        default:
-                            setFragmentState(FragmentState.Play);
-                }
-                return false;
-            };
+        switch (item.getItemId()) {
+            case R.id.playlist:
+                setFragmentState(FragmentState.PlayList);
+                return true;
+            case R.id.favorite:
+                setFragmentState(FragmentState.Favorite);
+                return true;
+            case R.id.home:
+                setFragmentState(FragmentState.Home);
+                return true;
+            case R.id.youtube:
+                setFragmentState(FragmentState.YouTube);
+                return true;
+            case R.id.artiste:
+                setFragmentState(FragmentState.Artist);
+                return true;
+            default:
+                setFragmentState(FragmentState.Play);
+        }
+        return false;
+    };
 
     public void setFragmentState(FragmentState fragmentState) {
         mFragmentState = fragmentState;
-            switch (mFragmentState) {
-                case Home:
-                    showHomeFragment();
-                    break;
-                case Play:
-                   showPlayFragment();
-                    break;
-                case Artist:
-                    showArtistFragment();
-                    break;
-                case YouTube:
-                    showYouTubeFragment();
-                    break;
-                case PlayList:
-                   showPlayListFragment();
-                    break;
-                case Favorite:
-                    showFavoriteFragment();
-                    break;
-            }
+        switch (mFragmentState) {
+            case Home:
+                showHomeFragment();
+                break;
+            case Play:
+                showPlayFragment();
+                break;
+            case Artist:
+                showArtistFragment();
+                break;
+            case YouTube:
+                showYouTubeFragment();
+                break;
+            case PlayList:
+                showPlayListFragment();
+                break;
+            case Favorite:
+                showFavoriteFragment();
+                break;
+        }
     }
 
     private void showFavoriteFragment() {
@@ -279,12 +279,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showPlayFragment() {
-        playFragment = new PlayFragment();
-        FragmentManager fm1 = getFragmentManager();
-        fm1.beginTransaction()
-                .replace(R.id.fragment_container, playFragment)
-                .addToBackStack(null)
-                .commit();
+        if(!fromSavedInstanceState) {
+            playFragment = new PlayFragment();
+            FragmentManager fm1 = getFragmentManager();
+            fm1.beginTransaction()
+                    .replace(R.id.fragment_container, playFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     private void showHomeFragment() {

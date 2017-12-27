@@ -6,11 +6,17 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.LayoutRes;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import com.udacity.capstone.musicapp.R;
+import com.udacity.capstone.musicapp.data.DataManeger;
+import com.udacity.capstone.musicapp.ui.MainActivity;
 import com.udacity.capstone.musicapp.ui.MusicService;
 
 
@@ -25,32 +31,9 @@ public class MusicPlayerWidget extends AppWidgetProvider {
         onUpdate(context, appWidgetManager, appWidgetIds, null);
     }
 
-    private void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds,Bundle extras){
+    public static void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds,Bundle extras){
         ComponentName serviceName = new ComponentName(context, MusicService.class);
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), getLayoutRes());
-        try {
-            onViewsUpdate(context, remoteViews, serviceName, extras);
-            appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        String action = intent.getAction();
-        if (action != null && action.startsWith("com.udacity.mazzika")) {
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            ComponentName thisAppWidget = new ComponentName(context.getPackageName(), this.getClass().getName());
-            int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
-            onUpdate(context, appWidgetManager, appWidgetIds, intent.getExtras());
-        } else {
-            super.onReceive(context, intent);
-        }
-    }
-
-    public void onViewsUpdate(Context context, RemoteViews remoteViews, ComponentName serviceName, Bundle extras){
-
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_standard);
         remoteViews.setOnClickPendingIntent(R.id.image_next, PendingIntent.getService(
                 context,
                 REQUEST_NEXT,
@@ -75,9 +58,22 @@ public class MusicPlayerWidget extends AppWidgetProvider {
                         .setComponent(serviceName),
                 0
         ));
+        if (extras != null) {
+            String t = extras.getString("name");
+            if (t != null) {
+                remoteViews.setTextViewText(R.id.textView_title, t);
+            }
+            t = extras.getString("artist");
+            if(t != null){
+                remoteViews.setTextViewText(R.id.textView_subtitle, t);
+            }
+            remoteViews.setImageViewResource(R.id.image_playpause,
+                    extras.getBoolean("playing") ? R.drawable.ic_pause_white_36dp : R.drawable.ic_play_white_36dp);
+        }
+        appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }
 
-    public  @LayoutRes int getLayoutRes(){
-        return R.layout.widget_standard;
-    }
+
+
+
 }

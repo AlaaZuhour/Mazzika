@@ -51,8 +51,7 @@
         android:id="@+id/floatingActionButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center"
-        android:clickable="true"
+        android:layout_gravity="end|center"
         app:elevation="8dp"
         app:srcCompat="@android:drawable/ic_media_play" />
 

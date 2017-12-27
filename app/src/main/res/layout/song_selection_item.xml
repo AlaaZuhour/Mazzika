@@ -14,7 +14,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="TextView"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="18sp" />
 
@@ -32,8 +31,9 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right|center"
-        android:layout_marginRight="16dp"
+        android:layout_gravity="end|center"
+        android:layout_marginEnd="16dp"
         android:visibility="invisible"
-        app:srcCompat="@android:drawable/checkbox_on_background" />
+        app:srcCompat="@android:drawable/checkbox_on_background"
+        android:contentDescription="@string/select" />
 </FrameLayout>

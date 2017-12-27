@@ -43,7 +43,6 @@ import retrofit2.Response;
 public class YouTubeFragment extends Fragment implements SongSelectedListener{
 
     private static final String API_KEY = "AIzaSyBJr1wF9qw70RxyqA0MCBcuxtu3-GxF_LE";
-    private OnFragmentInteractionListener mListener;
 
     private SearchResponse searchResponse;
     private ArrayList<Item> itemArrayList;
@@ -97,7 +96,6 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
 
                     @Override
                     public void onFailure(@NonNull Call<SearchResponse> call, @NonNull Throwable t) {
-                        Log.d("response", "fail");
                     }
                 });
             });
@@ -116,18 +114,11 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -157,14 +148,9 @@ public class YouTubeFragment extends Fragment implements SongSelectedListener{
 
             @Override
             public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-                Toast.makeText(getActivity(), "Error while initializing YouTubePlayer.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), getString(R.string.youtube_error), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }

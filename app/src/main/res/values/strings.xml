@@ -30,4 +30,27 @@
     <string name="mazzika">Mazzika Mix</string>
     <string name="no_playlist">Please Create a PlayList First</string>
     <string name="choose_playlist">Choose PlayList</string>
+    <string name="artist_maher_image">Select Artist Maher Zain</string>
+    <string name="artist_mesut_image">Select Artist Mesut Kerts</string>
+    <string name="artist_mazzika">Select Artist Mazzika Mix</string>
+    <string name="playback">PlayFragment background</string>
+    <string name="playback_back">Playback background</string>
+    <string name="play_prev">play previous song</string>
+    <string name="play">play current song</string>
+    <string name="play_next">play next song</string>
+    <string name="add_favorite">add song to favorite</string>
+    <string name="add_playlist">add song to playlist</string>
+    <string name="select">select song</string>
+    <string name="cover">song cover image</string>
+    <string name="logout">Log out</string>
+    <string name="no_internet">No Internet Connection Available</string>
+    <string name="mix">mix</string>
+    <string name="maher">maher</string>
+    <string name="mesut">mesut</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="youtube_error">Error while initializing YouTubePlayer.</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="app_id">ca-app-pub-3204898404950904~3126424700</string>
 </resources>
