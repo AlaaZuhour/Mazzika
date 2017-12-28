@@ -53,6 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|center"
         app:elevation="8dp"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@android:drawable/ic_media_play"
+        android:contentDescription="@string/play"/>
 
 </android.support.v7.widget.CardView>

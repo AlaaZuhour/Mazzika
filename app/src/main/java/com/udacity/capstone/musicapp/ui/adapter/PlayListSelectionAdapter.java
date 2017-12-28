@@ -76,6 +76,10 @@ public class PlayListSelectionAdapter extends RecyclerView.Adapter<PlayListSelec
 
 
     public Playlist getSelectedList(){
-        return playlists.get(lastCheckedPosition);
+        if(playlists.size() > 0) {
+            return playlists.get(lastCheckedPosition);
+        }
+
+        return null;
     }
 }

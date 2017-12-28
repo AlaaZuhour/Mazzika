@@ -44,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
+        setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
         MobileAds.initialize(this, getString(R.string.app_id));
 
@@ -58,8 +60,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
+
 
         login.setText(getString(R.string.sign_up));
         login.setOnClickListener(v -> {

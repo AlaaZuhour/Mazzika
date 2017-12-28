@@ -283,7 +283,7 @@ public class PlayFragment extends Fragment implements View.OnClickListener{
         dialogBuilder.setView(dialogView);
 
         playlists = DataManeger.queryPlaylist(getActivity());
-        if(playlists != null || playlists.size() == 0) {
+        if(playlists != null ) {
             final RecyclerView songsRecyclerView = dialogView.findViewById(R.id.song_list_dialog);
             prepareRecycler(songsRecyclerView);
 
@@ -296,7 +296,12 @@ public class PlayFragment extends Fragment implements View.OnClickListener{
 
         dialogBuilder.setPositiveButton(getString(R.string.done), (dialog, whichButton) -> {
             Playlist selectedPlayList = selectionAdaptor.getSelectedList();
-            updatePlayLists(selectedPlayList);
+            if(selectedPlayList != null) {
+                updatePlayLists(selectedPlayList);
+            }else {
+                Toast.makeText(getActivity(),getString(R.string.no_playlist),Toast.LENGTH_SHORT).show();
+                return;
+            }
         });
 
         dialogBuilder.setNegativeButton(getString(R.string.cancel), (dialog, whichButton) ->
