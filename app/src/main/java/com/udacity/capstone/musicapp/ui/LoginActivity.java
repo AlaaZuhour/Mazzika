@@ -44,23 +44,23 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
 
-        MobileAds.initialize(this, getString(R.string.app_id));
-
-        AdView mAdView = findViewById(R.id.adView);
-
-        if (mAdView != null) {
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
-        }
 
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
+        setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
+        MobileAds.initialize(this, getString(R.string.app_id));
+
+//        AdView mAdView = findViewById(R.id.adView);
+//
+//        if (mAdView != null) {
+//            AdRequest adRequest = new AdRequest.Builder().build();
+//            mAdView.loadAd(adRequest);
+//        }
 
         login.setText(getString(R.string.sign_up));
         login.setOnClickListener(v -> {

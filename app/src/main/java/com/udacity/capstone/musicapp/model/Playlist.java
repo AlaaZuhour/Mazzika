@@ -45,8 +45,9 @@ public class Playlist implements Parcelable{
         return name;
     }
 
-    public void setName(String name) {
+    public Playlist setName(String name) {
         this.name = name;
+        return this;
     }
 
     public int getId() {

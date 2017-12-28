@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.udacity.capstone.musicapp">
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -15,13 +16,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ActionBar.Transparent"
-        android:fullBackupContent="@xml/backup_descriptor">
-        <activity android:name=".ui.LoginActivity">
+        android:fullBackupContent="@xml/backup_descriptor"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".ui.LoginActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <service
@@ -45,6 +49,10 @@
         <activity android:name=".ui.MainActivity"
             android:label="@string/mazzika"
             android:parentActivityName=".ui.LoginActivity"/>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/app_id"/>
     </application>
 
 </manifest>

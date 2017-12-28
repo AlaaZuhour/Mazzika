@@ -58,6 +58,7 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
     private ArrayList<Playlist> playlists;
     private RecyclerView songsRecyclerView;
     private ArrayList<Song> songs;
+    private MusicAdapter musicAdapter;
     private SongSelectionAdaptor selectionAdaptor;
 
 
@@ -90,7 +91,7 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
         if (playlists == null || playlists.size() == 0) {
             noPlaylists.setVisibility(View.VISIBLE);
         } else {
-            MusicAdapter musicAdapter = new MusicAdapter(this);
+            musicAdapter = new MusicAdapter(this);
             noPlaylists.setVisibility(View.GONE);
             musicAdapter.setPlaylists(playlists);
             mRecyclerView.setAdapter(musicAdapter);
@@ -136,6 +137,14 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
         dialogBuilder.setPositiveButton(getString(R.string.done), (dialog, whichButton) -> {
             ArrayList<Song> selectedSongs = selectionAdaptor.getSelectedList();
             updateSongs(selectedSongs);
+            if (musicAdapter != null){
+                musicAdapter.notifyDataSetChanged();
+            }else {
+                musicAdapter = new MusicAdapter(this);
+                noPlaylists.setVisibility(View.GONE);
+                musicAdapter.setPlaylists(playlists);
+                mRecyclerView.setAdapter(musicAdapter);
+            }
         });
 
         dialogBuilder.setNegativeButton(getString(R.string.cancel), (dialog, whichButton) ->
@@ -143,11 +152,11 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
         AlertDialog b = dialogBuilder.create();
         b.show();
 
+
     }
 
     private void prepareRecycler(RecyclerView songsRecyclerView) {
-        LinearLayoutManager linearLayoutManager =
-                new LinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         selectionAdaptor = new SongSelectionAdaptor(this);
         selectionAdaptor.setMusicList(songs);
         songsRecyclerView.setLayoutManager(linearLayoutManager);
@@ -169,6 +178,7 @@ public class PlayListFragment extends Fragment implements SongSelectedListener {
         contentValues1.put(MusicContract.PlaylistEntry.COLUMN_PLAYLIST_NAME, s);
         contentValues[0] = contentValues1;
         DataManeger.addPlaylists(getActivity(), contentValues);
+        playlists.add(new Playlist().setName(s));
     }
 
 
